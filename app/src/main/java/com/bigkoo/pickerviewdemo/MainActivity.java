@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bigkoo.pickerview.OptionsPickerView;
 import com.bigkoo.pickerview.TimePickerView;
@@ -15,6 +16,7 @@ import com.bigkoo.pickerview.listener.CustomListener;
 import com.bigkoo.pickerview.lib.WheelView;
 
 import com.bigkoo.pickerview.model.IPickerViewData;
+import com.bigkoo.pickerviewdemo.bean.CardAndColorBean;
 import com.bigkoo.pickerviewdemo.bean.CardBean;
 import com.bigkoo.pickerviewdemo.bean.PickerViewData;
 import com.bigkoo.pickerviewdemo.bean.ProvinceBean;
@@ -30,11 +32,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private ArrayList<ProvinceBean> options1Items = new ArrayList<>();
     private ArrayList<ArrayList<String>> options2Items = new ArrayList<>();
     private ArrayList<ArrayList<ArrayList<IPickerViewData>>> options3Items = new ArrayList<>();
-    private Button btn_Time, btn_Options,btn_CustomOptions,btn_CustomTime;
+    private Button btn_Time, btn_Options,btn_CustomOptions,btn_CustomTime,btn_CustomOptionsAndColor;
 
     private TimePickerView pvTime,pvCustomTime;
-    private OptionsPickerView pvOptions,pvCustomOptions;
+    private OptionsPickerView pvOptions,pvCustomOptions,pvCustomOptionsAndColor;
     private ArrayList<CardBean> cardItem = new ArrayList<>();
+    private ArrayList<CardAndColorBean> cardItemAndColor = new ArrayList<>();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,15 +52,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         initOptionData();
         initOptionPicker();
         initCustomOptionPicker();
+        initCustomOptionAndColorPicker();
 
         btn_Time = (Button) findViewById(R.id.btn_Time);
         btn_Options = (Button) findViewById(R.id.btn_Options);
         btn_CustomOptions = (Button) findViewById(R.id.btn_CustomOptions);
         btn_CustomTime = (Button) findViewById(R.id.btn_CustomTime);
+        btn_CustomOptionsAndColor = (Button) findViewById(R.id.btn_CustomOptionsAndColor);
         btn_Time.setOnClickListener(this);
         btn_Options.setOnClickListener(this);
         btn_CustomOptions.setOnClickListener(this);
         btn_CustomTime.setOnClickListener(this);
+        btn_CustomOptionsAndColor.setOnClickListener(this);
     }
 
 
@@ -71,6 +78,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             pvCustomOptions.show(); //弹出自定义条件选择器
         }else if (v.getId() == R.id.btn_CustomTime && pvCustomTime != null) {
             pvCustomTime.show(); //弹出自定义时间选择器
+        }else if (v.getId()==R.id.btn_CustomOptionsAndColor&&pvCustomOptionsAndColor!=null){
+            pvCustomOptionsAndColor.show();
         }
     }
 
@@ -165,6 +174,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void initOptionData() {
         getData();
+        getDataAndColor();
         //选项1
         options1Items.add(new ProvinceBean(0,"广东","描述部分","其他数据"));
         options1Items.add(new ProvinceBean(1,"湖南","描述部分","其他数据"));
@@ -361,9 +371,73 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         pvCustomOptions.setPicker(cardItem);//添加数据
     }
 
+    private void initCustomOptionAndColorPicker() {//条件选择器初始化，自定义布局
+
+        // 注意，自定义布局中，optionspicker 或者 timepicker 的布局必须要有（即WheelView内容部分），否则会报空指针
+        // 具体可参考demo 里面的两个自定义布局
+        pvCustomOptionsAndColor = new OptionsPickerView.Builder(this, new OptionsPickerView.OnOptionsSelectListener() {
+            @Override
+            public void onOptionsSelect(int options1, int option2, int options3, View v) {
+                //返回的分别是三个级别的选中位置
+                String tx = cardItemAndColor.get(options1).getPickerViewText();
+                boolean isBlack = cardItemAndColor.get(options1).isBlackColor();
+                if (isBlack) {
+                    btn_CustomOptionsAndColor.setText(tx);
+                    pvCustomOptionsAndColor.dismiss();
+                } else {
+                    Toast.makeText(MainActivity.this, "手动设置不能选择", Toast.LENGTH_SHORT).show();
+                }
+
+            }
+        })
+                .setLayoutRes(R.layout.pickerview_custom_options, new CustomListener() {
+                    @Override
+                    public void customLayout(View v) {
+                        final TextView tvSubmit = (TextView) v.findViewById(R.id.tv_finish);
+                        final TextView tvAdd = (TextView) v.findViewById(R.id.tv_add);
+                        ImageView ivCancel = (ImageView) v.findViewById(R.id.iv_cancel);
+                        tvSubmit.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+
+                                pvCustomOptionsAndColor.returnData(tvSubmit);
+                            }
+                        });
+                        ivCancel.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                pvCustomOptionsAndColor.dismiss();
+                            }
+                        });
+
+                        tvAdd.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                getDataAndColor();
+                                pvCustomOptionsAndColor.setPicker(cardItemAndColor);
+                            }
+                        });
+
+                    }
+                })
+                .build();
+        pvCustomOptionsAndColor.setPicker(cardItemAndColor);//添加数据
+    }
+
     public void getData() {
         for (int i = 0; i < 5; i++) {
             cardItem.add(new CardBean(i, "No.ABC12345 " + i));
+        }
+    }
+
+    public void getDataAndColor() {
+        for (int i = 0; i < 5; i++) {
+            if (i == 1 || i == 3) {
+                cardItemAndColor.add(new CardAndColorBean(i, "No.ABC12345 " + i,false));
+            } else {
+                cardItemAndColor.add(new CardAndColorBean(i, "No.ABC12345 " + i,true));
+            }
+
         }
     }
 
@@ -383,6 +457,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 return true;
             }
             if (pvCustomTime.isShowing()) {
+                pvCustomTime.dismiss();
+                return true;
+            }
+            if (pvCustomOptionsAndColor.isShowing()) {
                 pvCustomTime.dismiss();
                 return true;
             }

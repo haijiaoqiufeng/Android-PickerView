@@ -8,6 +8,7 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
 import com.bigkoo.pickerview.listener.CustomListener;
 import com.bigkoo.pickerview.lib.WheelView;
 import com.bigkoo.pickerview.view.BasePickerView;
@@ -355,8 +356,10 @@ public class OptionsPickerView<T> extends BasePickerView implements View.OnClick
             btnCancel.setOnClickListener(this);
 
             //设置文字
-            btnSubmit.setText(TextUtils.isEmpty(Str_Submit) ? context.getResources().getString(R.string.pickerview_submit) : Str_Submit);
-            btnCancel.setText(TextUtils.isEmpty(Str_Cancel) ? context.getResources().getString(R.string.pickerview_cancel) : Str_Cancel);
+            btnSubmit.setText(TextUtils.isEmpty(Str_Submit) ? context.getResources().getString(R.string
+                    .pickerview_submit) : Str_Submit);
+            btnCancel.setText(TextUtils.isEmpty(Str_Cancel) ? context.getResources().getString(R.string
+                    .pickerview_cancel) : Str_Cancel);
             tvTitle.setText(TextUtils.isEmpty(Str_Title) ? "" : Str_Title);//默认为空
 
             //设置文字颜色
@@ -384,7 +387,7 @@ public class OptionsPickerView<T> extends BasePickerView implements View.OnClick
 
         setOutSideCancelable(cancelable);
 
-        if (tvTitle!= null){
+        if (tvTitle != null) {
             tvTitle.setText(Str_Title);
         }
 
@@ -422,7 +425,7 @@ public class OptionsPickerView<T> extends BasePickerView implements View.OnClick
     }
 
     private void SetCurrentItems() {
-        if(wheelOptions!=null){
+        if (wheelOptions != null) {
             wheelOptions.setCurrentItems(option1, option2, option3);
         }
     }
@@ -462,9 +465,14 @@ public class OptionsPickerView<T> extends BasePickerView implements View.OnClick
     public void returnData(View v) {
         if (optionsSelectListener != null) {
             int[] optionsCurrentItems = wheelOptions.getCurrentItems();
-            optionsSelectListener.onOptionsSelect(optionsCurrentItems[0], optionsCurrentItems[1], optionsCurrentItems[2], v);
+
+            optionsSelectListener.onOptionsSelect(optionsCurrentItems[0], optionsCurrentItems[1],
+                    optionsCurrentItems[2], v);
+
+
         }
-        dismiss();
+
+
     }
 
     public interface OnOptionsSelectListener {

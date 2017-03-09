@@ -10,4 +10,5 @@
 
     <string name="picker_custom_time">时间选择器自定义布局</string>
     <string name="picker_custom_province">条件选择器自定义布局</string>
+    <string name="picker_custom_province_and_color">条件选择器自定义布局包括颜色</string>
 </resources>
